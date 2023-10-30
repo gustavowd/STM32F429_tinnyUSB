@@ -35,20 +35,15 @@
  //--------------------------------------------------------------------+
 
  // RHPort number used for device can be defined by board.mk, default to port 0
- #ifndef BOARD_TUD_RHPORT
- #define BOARD_TUD_RHPORT     1
- #endif
+#define BOARD_TUD_RHPORT     1
 
-#ifndef CFG_TUSB_RHPORT1_MODE
-#define CFG_TUSB_RHPORT1_MODE    OPT_MODE_DEVICE
-#endif
+
+#define CFG_TUSB_RHPORT1_MODE    (OPT_MODE_DEVICE | OPT_MODE_FULL_SPEED)
 
 //#define USB_HS_PHYC 1s
 
  // RHPort max operational speed can defined by board.mk
- #ifndef BOARD_TUD_MAX_SPEED
- #define BOARD_TUD_MAX_SPEED   OPT_MODE_FULL_SPEED
- #endif
+#define BOARD_TUD_MAX_SPEED   OPT_MODE_FULL_SPEED
 
  //--------------------------------------------------------------------
  // COMMON CONFIGURATION
@@ -56,9 +51,6 @@
 
  // defined by board.mk
 #define CFG_TUSB_MCU OPT_MCU_STM32F4
- #ifndef CFG_TUSB_MCU
- #error CFG_TUSB_MCU must be defined
- #endif
 
  // This examples use FreeRTOS
  #define CFG_TUSB_OS           OPT_OS_FREERTOS

@@ -31,7 +31,7 @@
 
 // Since TinyUSB doesn't use SOF for now, and this interrupt too often (1ms interval)
 // We disable SOF for now until needed later on
-#define USE_SOF     1
+#define USE_SOF     0
 
 #if defined (STM32F105x8) || defined (STM32F105xB) || defined (STM32F105xC) || \
     defined (STM32F107xB) || defined (STM32F107xC)
@@ -69,8 +69,8 @@
 
 #elif CFG_TUSB_MCU == OPT_MCU_STM32F4
 #include "stm32f4xx.h"
-//#define EP_MAX_FS       USB_OTG_FS_MAX_IN_ENDPOINTS
-//#define EP_FIFO_SIZE_FS USB_OTG_FS_TOTAL_FIFO_SIZE
+#define EP_MAX_FS       USB_OTG_FS_MAX_IN_ENDPOINTS
+#define EP_FIFO_SIZE_FS USB_OTG_FS_TOTAL_FIFO_SIZE
 #define EP_MAX_HS       USB_OTG_HS_MAX_IN_ENDPOINTS
 #define EP_FIFO_SIZE_HS USB_OTG_HS_TOTAL_FIFO_SIZE
 
@@ -525,16 +525,18 @@ void dcd_init (uint8_t rhport)
   set_speed(rhport, TUD_OPT_HIGH_SPEED ? TUSB_SPEED_HIGH : TUSB_SPEED_FULL);
 
   // Enable internal USB transceiver, unless using HS core (port 1) with external PHY.
-  if (!(rhport == 1 && (CFG_TUSB_RHPORT1_MODE & OPT_MODE_HIGH_SPEED))) usb_otg->GCCFG |= USB_OTG_GCCFG_PWRDWN;
-
+#if CFG_TUSB_RHPORT1_MODE
+  if (!(rhport == 1 && (CFG_TUSB_RHPORT1_MODE & OPT_MODE_HIGH_SPEED))) {
+	  usb_otg->GCCFG |= USB_OTG_GCCFG_PWRDWN;
+  }
+#endif
 
   usb_otg->GINTMSK |= USB_OTG_GINTMSK_USBRST   | USB_OTG_GINTMSK_ENUMDNEM |
       USB_OTG_GINTMSK_USBSUSPM | USB_OTG_GINTMSK_WUIM     |
       USB_OTG_GINTMSK_RXFLVLM  | (USE_SOF ? USB_OTG_GINTMSK_SOFM : 0);
 
-
   usb_otg->GUSBCFG &= ~(USB_OTG_GUSBCFG_FHMOD | USB_OTG_GUSBCFG_FDMOD);
-  usb_otg->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+    usb_otg->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 
   // Enable global interrupt
   usb_otg->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
@@ -610,14 +612,9 @@ void dcd_disconnect(uint8_t rhport)
 void dcd_sof_enable(uint8_t rhport, bool en)
 {
   (void) rhport;
+  (void) en;
 
-  //USB_OTG_DeviceTypeDef * dev = DEVICE_BASE(rhport);
-  if (en) {
-    USB_OTG_HS->GINTSTS = USB_OTG_GINTSTS_SOF;
-    USB_OTG_HS->GINTMSK |= USB_OTG_GINTMSK_SOFM;
-  } else {
-    USB_OTG_HS->GINTMSK &= ~USB_OTG_GINTMSK_SOFM;
-  }
+  // TODO implement later
 }
 
 /*------------------------------------------------------------------*/
@@ -1195,11 +1192,9 @@ void dcd_int_handler(uint8_t rhport)
     usb_otg->GINTSTS = USB_OTG_GINTSTS_SOF;
 
     // Disable SOF interrupt since currently only used for remote wakeup detection
-    //usb_otg->GINTMSK &= ~USB_OTG_GINTMSK_SOFM;
-    uint32_t frame_count = (dev->DSTS & USB_OTG_DSTS_FNSOF_Msk) >> USB_OTG_DSTS_FNSOF_Pos;
+    usb_otg->GINTMSK &= ~USB_OTG_GINTMSK_SOFM;
 
-    //dcd_event_bus_signal(rhport, DCD_EVENT_SOF, true);
-    dcd_event_sof(rhport, frame_count, true);
+    dcd_event_bus_signal(rhport, DCD_EVENT_SOF, true);
   }
 
   // RxFIFO non-empty interrupt handling.
