@@ -55,6 +55,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/STM32F429_tinnyUSB/Middlewares/Third_Party/tinyusb-0.15.0/hw}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/STM32F429_tinnyUSB/Middlewares/Third_Party/tinyusb-0.15.0/hw/bsp/stm32f4/boards/stm32f429nucleo}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/STM32F429_tinnyUSB/Middlewares/Third_Party/tinyusb-0.15.0/src/device}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/STM32F429_tinnyUSB/Middlewares/Third_Party/FreeRTOS_CLI}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.519472082" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
