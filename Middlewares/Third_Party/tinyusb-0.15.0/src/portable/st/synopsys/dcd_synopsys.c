@@ -351,7 +351,7 @@ static void set_speed(uint8_t rhport, tusb_speed_t speed)
 
   if ( rhport == 1 )
   {
-    bitvalue = ((TUSB_SPEED_HIGH == speed) ? DCD_HIGH_SPEED : DCD_FULL_SPEED_USE_HS);
+    bitvalue = ((TUSB_SPEED_HIGH == speed) ? DCD_HIGH_SPEED : DCD_FULL_SPEED);
   }
   else
   {
@@ -536,7 +536,14 @@ void dcd_init (uint8_t rhport)
       USB_OTG_GINTMSK_RXFLVLM  | (USE_SOF ? USB_OTG_GINTMSK_SOFM : 0);
 
   usb_otg->GUSBCFG &= ~(USB_OTG_GUSBCFG_FHMOD | USB_OTG_GUSBCFG_FDMOD);
-    usb_otg->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+
+#if CFG_TUD_ENABLED
+  usb_otg->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+#endif
+
+#if CFG_TUH_ENABLED
+  usb_otg->GUSBCFG |= USB_OTG_GUSBCFG_FHMOD;
+#endif
 
   // Enable global interrupt
   usb_otg->GAHBCFG |= USB_OTG_GAHBCFG_GINT;
